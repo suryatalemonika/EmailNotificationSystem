@@ -1,0 +1,14 @@
+module.exports = {
+    mongoURI: "mongodb://localhost:27017/notification_system",
+    kafkaBroker: "localhost:9092",
+    elasticsearchNode: "http://localhost:9200",
+    emailService: {
+        service: 'gmail',
+        auth: {
+          user: 'suryatalemonika@gmail.com',
+          pass: 'himl bbnt afbf etwd'
+        }
+    },
+    smsApi: "https://mock-sms-service.com/send",
+    pushApi: "https://mock-push-service.com/send",
+};

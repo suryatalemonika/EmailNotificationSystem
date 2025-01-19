@@ -1,0 +1,48 @@
+const Notification = require("../models/Notification.js");
+const UserPreference = require("../models/UserPreference");
+const { processNotification } = require("./deliveryService.js");
+
+async function processMessage(message) {
+    try {
+        const notification = JSON.parse(message.value);
+
+        let userPreference = await UserPreference.findOne({ userId: notification.userId });
+
+        if (!userPreference) {
+            console.log(`No preferences found for user: ${notification.userId}. Using defaults.`);
+            userPreference = {
+                channels: ["email"],
+                quietHours: { start: 22, end: 6 },
+                maxNotificationsPerHour: 10,
+            };
+        }
+
+        const recentNotifications = await Notification.countDocuments({
+            userId: notification.userId,
+            created_at: { $gte: new Date(Date.now() - 3600000) },
+        });
+        if (recentNotifications >= userPreference.maxNotificationsPerHour) {
+            console.log(`Throttling limit reached for user: ${notification.userId}`);
+            return;
+        }
+
+        const currentHour = new Date().getHours();
+        if (
+            userPreference.quietHours.start <= currentHour &&
+            userPreference.quietHours.end > currentHour
+        ) {
+            notification.send_time = new Date();
+            notification.send_time.setHours(userPreference.quietHours.end);
+        }
+
+        await Notification.create(notification);
+
+        if (notification.priority === "high" || !notification.send_time) {
+            await processNotification(notification);
+        }
+    } catch (err) {
+        console.error("Error processing message:", err);
+    }
+}
+
+module.exports = { processMessage };
