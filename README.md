@@ -1,78 +1,50 @@
-Task: Distributed Notification and Alert System
-Objective
-Build a backend system to manage and deliver notifications based on user preferences and
-rules. This includes immediate notifications, scheduled alerts, and personalized delivery times,
-as well as support for query-driven notification logic.
-Task Requirements
-1. Notification Ingestion and Validation Service (Node.js / Go)
-○ Endpoint: Create a /notify API endpoint in Node.js to receive notification
-requests.
-○ Data Handling: Each notification request should gather basic notification-related
-details like time, message, etc. You can add any other field you think is
-necessary for implementing the use case.
-○ Kafka Integration: Publish validated requests to a Kafka topic
-(notifications) for further processing.
-2. Notification Processing and Scheduling Engine (Node.js / Go)
-○ Real-Time Notifications: Implement logic to immediately process high-priority
-notifications or notifications without a send_time.
-○ Scheduled Notifications: Store notification details in MongoDB.
-■ Implement a scheduler to periodically check for pending notifications and
-move them to the delivery queue.
-3. User Preferences and Rules Storage (MongoDB + Elasticsearch)
-○ User Preferences: Store user preferences in MongoDB:
-■ Preferred notification channels (e.g., email, SMS, push).
-■ Quiet hours (e.g., Do Not Disturb between 10 PM and 8 AM).
-■ Notification limits (e.g., max 3 notifications per hour).
-○ Content Filtering: Store notification content in Elasticsearch with fields like
-message, type, priority, send_time, and user_id to enable efficient
-search queries.
-4. Query Requirements
-○ Query 1: Throttling Notifications
-■ Implement a query to restrict notifications based on user-defined limits.
-■ Use MongoDB to check recent notifications sent to a user, ensuring the
-count does not exceed the hourly limit.
-■ If the limit is reached, either discard or defer the notification.
-○ Query 2: Quiet Hours Filtering
-■ Implement logic to detect user-defined quiet hours, preventing
-notifications from being sent within these hours.
-■ If a notification falls within quiet hours, reschedule it for the user’s next
-active hour.
-○ Query 3: Deduplication of Similar Alerts
-■ Deduplicate alerts if a similar one has been sent recently (e.g., suppress
-identical error notifications sent within the last 1 hour)
-○ Query 4: Scheduled Notification Aggregation
-■ Implement a batch process that aggregates low-priority notifications due
-in the same hour into a single summary message.
-■ Retrieve all low-priority notifications from MongoDB scheduled within the
-same hour and create a summary before sending.
-○ Query 5: Urgent Alerts in Real Time
-■ Design a query that prioritizes urgent alerts and processes them
-immediately, bypassing scheduling.
-■ In MongoDB, set up a priority field and query for high-priority items,
-immediately moving them to the delivery queue.
-5. Notification Delivery Service (Node.js)
-○ Channels: Implement functionality to send notifications via:
-■ Email: Use a mock email service or API.
-■ SMS: Integrate with a mock SMS service.
-■ Push Notifications: Simulate push notifications.
-○ Retry Mechanism: Implement a retry mechanism for failures
-○ Logging: Record delivery statuses in MongoDB.
-6. Containerization and Deployment
-○ Docker Setup: Dockerize each component (Node.js / Go services, MongoDB,
-Kafka, Elasticsearch).
-○ Docker Compose: Create a docker-compose.yml file to enable easy
-deployment of all services with predefined networking and environment
-configurations.
-7. Bonus: Analytics and Monitoring Dashboard API
-○ Implement an endpoint (/analytics) that provides:
-■ Delivery Stats: Total notifications sent, failed, and retried.
-■ User Engagement: Average delivery time, and response rate.
-Submissions
-● GitHub Repository: A project repository on GitHub.
-● README.md: This file should include a description of your implementation, the design
-choices you made, and any known issues present at the time of submission.
-● FutureScope.md: This file should outline future enhancements you believe would
-improve the project.
-● Scale.md: This file should include your perspective on scaling the project for
-high-volume deployment. Describe the changes you would make to meet scaling
-demands and explain the rationale behind each change.
+
+# Distributed Notification and Alert System (EmailNotificationSystem)
+
+## Description
+
+This project is a **Distributed Notification and Alert System** designed to deliver notifications to users via multiple channels like **email**, **SMS**, and **push notifications**. The system supports **Kafka** for message processing, **MongoDB** for data storage, and integrates basic features like throttling, quiet hours, and prioritization. The system also includes an **analytics endpoint** to gather delivery statistics and user engagement metrics.
+
+### Key Features:
+- **Message Delivery:** Notifications are delivered via email, SMS, and push channels.
+- **Throttling:** Limits the number of notifications per user per hour.
+- **Quiet Hours:** Prevents notifications during the user's defined quiet hours.
+- **Kafka:** Used for event-driven message processing.
+- **MongoDB:** Stores notification and user preference data.
+- **Analytics API:** Provides insights into delivery stats and user engagement.
+
+## Design Choices
+
+### **Message Processing with Kafka**
+Kafka is used as the backbone of the system for message queuing and processing. The producer sends notification messages to Kafka, and the consumer processes those messages, ensuring that each notification is delivered according to the user's preferences.
+
+### **User Preferences**
+Each user has specific notification preferences that determine the channels through which they want to receive notifications, the quiet hours during which they don't want notifications, and the maximum notifications per hour.
+
+### **Notification Delivery Logic**
+The system supports **email**, **SMS**, and **push notifications**, with logic to send notifications based on user preferences. It also supports retry logic, where notifications can be retried in case of failure.
+
+### **Analytics Endpoint**
+The `/analytics` endpoint provides key metrics like:
+- **Delivery Stats**: Total notifications sent, failed, and retried.
+- **User Engagement**: Average delivery time and response rate.
+
+These metrics can help in monitoring the performance of the system and understanding how users interact with notifications.
+
+## Installation
+
+### Prerequisites
+1. **MongoDB**: Ensure you have MongoDB installed and running on `localhost:27017`.
+2. **Kafka**: Ensure Kafka is set up and running on `localhost:9092`.
+3. **Node.js**: Install Node.js from [here](https://nodejs.org/).
+
+### Steps to Run
+1. Clone this repository to your local machine:
+   ```bash
+   git clone [git url](https://github.com/suryatalemonika/EmailNotificationSystem.git).
+   cd EmailNotificationSystem/src
+   node server.js
+   ```
+**Make sure all dependencies should be installed before run this project**
+
+
