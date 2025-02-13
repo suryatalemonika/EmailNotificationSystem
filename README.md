@@ -48,3 +48,6 @@ These metrics can help in monitoring the performance of the system and understan
 **Make sure all dependencies should be installed before run this project**
 
 
+~/kafka_2.13-3.9.0/bin/zookeeper-server-start.sh ~/kafka_2.13-3.9.0/config/zookeeper.properties
+~/kafka_2.13-3.9.0/bin/kafka-server-start.sh ~/kafka_2.13-3.9.0/config/server.properties
+
